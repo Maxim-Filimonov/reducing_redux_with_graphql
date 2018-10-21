@@ -114,19 +114,19 @@ class App extends Component {
             <button
               onClick={() =>
                 removeReaction({
-                  // optimisticResponse: {
-                  //   removeReaction: {
-                  //     subject: {
-                  //       reactions: {
-                  //         viewerHasReacted: false,
-                  //         __typename: "ReactionConnection",
-                  //       },
-                  //       id: id,
-                  //       __typename: "Issue",
-                  //     },
-                  //     __typename: "RemoveReactionPayload",
-                  //   },
-                  // },
+                  optimisticResponse: {
+                    removeReaction: {
+                      subject: {
+                        reactions: {
+                          viewerHasReacted: false,
+                          __typename: "ReactionConnection",
+                        },
+                        id: id,
+                        __typename: "Issue",
+                      },
+                      __typename: "RemoveReactionPayload",
+                    },
+                  },
                 })
               }
             >
@@ -138,7 +138,29 @@ class App extends Component {
     } else {
       return (
         <Mutation mutation={ADD_REACTION_TO_ISSUE} variables={{ id }}>
-          {addReaction => <button onClick={addReaction}>👍</button>}
+          {addReaction => (
+            <button
+              onClick={() =>
+                addReaction({
+                  optimisticResponse: {
+                    addReaction: {
+                      subject: {
+                        reactions: {
+                          viewerHasReacted: true,
+                          __typename: "ReactionConnection",
+                        },
+                        id: id,
+                        __typename: "Issue",
+                      },
+                      __typename: "RemoveReactionPayload",
+                    },
+                  },
+                })
+              }
+            >
+              👍
+            </button>
+          )}
         </Mutation>
       );
     }
