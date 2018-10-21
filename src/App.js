@@ -12,11 +12,6 @@ const client = new ApolloClient({
   },
   clientState: {
     defaults: { activeIssue: "" },
-    typeDefs: `
-      type {
-        
-      }
-    `
   },
 });
 
