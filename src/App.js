@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { ApolloProvider, Query, Mutation } from "react-apollo";
+import { ApolloProvider, Query, Mutation, ApolloConsumer } from "react-apollo";
 import ApolloClient from "apollo-boost";
 import gql from "graphql-tag";
 
@@ -9,6 +9,14 @@ const client = new ApolloClient({
   uri: "https://api.github.com/graphql",
   headers: {
     Authorization: `Bearer ${process.env.REACT_APP_GITHUB_TOKEN}`,
+  },
+  clientState: {
+    defaults: { activeIssue: "" },
+    typeDefs: `
+      type {
+        
+      }
+    `
   },
 });
 
@@ -65,6 +73,12 @@ const REMOVE_REACTION_FROM_ISSUE = gql`
   }
 `;
 
+const GET_ACTIVE_ISSUE = gql`
+  {
+    activeIssue @client
+  }
+`;
+
 class App extends Component {
   render() {
     return (
@@ -90,20 +104,33 @@ class App extends Component {
 
   renderIssue = issue => {
     return (
-      <li style={{ listStyle: "none" }}>
-        <span> {issue.node.title} </span>
-        {issue.node.participants.edges.map(x => (
-          <img
-            style={{ borderRadius: 100, margin: 5 }}
-            width="100"
-            src={x.node.avatarUrl}
-          />
-        ))}
-        {this.renderThumbsUpOrDown(
-          issue.node.id,
-          issue.node.reactions.viewerHasReacted,
+      <Query query={GET_ACTIVE_ISSUE}>
+        {({ client, data }) => (
+          <li
+            onMouseOver={() => {
+              console.log("FOCUS!");
+              client.writeData({ data: { activeIssue: issue.node.id } });
+            }}
+            style={{
+              listStyle: "none",
+              color: data.activeIssue === issue.node.id ? "red" : "white",
+            }}
+          >
+            <span> {issue.node.title} </span>
+            {issue.node.participants.edges.map(x => (
+              <img
+                style={{ borderRadius: 100, margin: 5 }}
+                width="100"
+                src={x.node.avatarUrl}
+              />
+            ))}
+            {this.renderThumbsUpOrDown(
+              issue.node.id,
+              issue.node.reactions.viewerHasReacted,
+            )}
+          </li>
         )}
-      </li>
+      </Query>
     );
   };
   renderThumbsUpOrDown = (id, reacted) => {
