@@ -1,6 +1,41 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import ApolloClient from "apollo-boost";
+import gql from "graphql-tag";
+
+const client = new ApolloClient({
+  uri: "https://api.github.com/graphql",
+  headers: {
+    Authorization: `Bearer ${process.env.REACT_APP_GITHUB_TOKEN}`,
+  },
+});
+
+client
+  .query({
+    query: gql`
+      query {
+        repository(owner: "reactbris", name: "meetup") {
+          issues(last: 20, states: CLOSED) {
+            edges {
+              node {
+                title
+                url
+                participants(first: 100) {
+                  edges {
+                    node {
+                      avatarUrl
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+  })
+  .then(console.log.bind(console));
 
 class App extends Component {
   render() {
