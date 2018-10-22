@@ -28,7 +28,6 @@ const GET_ISSUES_AVATARS = gql`
             reactions {
               viewerHasReacted
             }
-            numberOfComments @rest('/issues/$id/comments/count')
             participants(first: 100) {
               edges {
                 node {
