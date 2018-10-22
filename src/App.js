@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import { ApolloProvider, Query, Mutation, ApolloConsumer } from "react-apollo";
+import { ApolloProvider, Query, Mutation } from "react-apollo";
 import ApolloClient from "apollo-boost";
 import gql from "graphql-tag";
 
@@ -117,6 +116,7 @@ class App extends Component {
                 style={{ borderRadius: 100, margin: 5 }}
                 width="100"
                 src={x.node.avatarUrl}
+                alt={`Avatar of ${x.node.name}`}
               />
             ))}
             {this.renderThumbsUpOrDown(
@@ -150,7 +150,7 @@ class App extends Component {
         >
           {removeReaction => (
             <button onClick={removeReaction}>
-              <span role="img" aria-label="thumbsdown">
+              <span role="img" alt="thumbsdown" aria-label="thumbsdown">
                 👎
               </span>
             </button>
