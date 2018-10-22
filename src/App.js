@@ -28,6 +28,7 @@ const GET_ISSUES_AVATARS = gql`
             reactions {
               viewerHasReacted
             }
+            numberOfComments @rest('/issues/$id/comments/count')
             participants(first: 100) {
               edges {
                 node {
@@ -131,56 +132,56 @@ class App extends Component {
   renderThumbsUpOrDown = (id, reacted) => {
     if (reacted) {
       return (
-        <Mutation mutation={REMOVE_REACTION_FROM_ISSUE} variables={{ id }}>
+        <Mutation
+          mutation={REMOVE_REACTION_FROM_ISSUE}
+          variables={{ id }}
+          optimisticResponse={{
+            removeReaction: {
+              subject: {
+                reactions: {
+                  viewerHasReacted: false,
+                  __typename: "ReactionConnection",
+                },
+                id: id,
+                __typename: "Issue",
+              },
+              __typename: "RemoveReactionPayload",
+            },
+          }}
+        >
           {removeReaction => (
-            <button
-              onClick={() =>
-                removeReaction({
-                  optimisticResponse: {
-                    removeReaction: {
-                      subject: {
-                        reactions: {
-                          viewerHasReacted: false,
-                          __typename: "ReactionConnection",
-                        },
-                        id: id,
-                        __typename: "Issue",
-                      },
-                      __typename: "RemoveReactionPayload",
-                    },
-                  },
-                })
-              }
-            >
-              👎
+            <button onClick={removeReaction}>
+              <span role="img" aria-label="thumbsdown">
+                👎
+              </span>
             </button>
           )}
         </Mutation>
       );
     } else {
       return (
-        <Mutation mutation={ADD_REACTION_TO_ISSUE} variables={{ id }}>
+        <Mutation
+          mutation={ADD_REACTION_TO_ISSUE}
+          variables={{ id }}
+          optimisticResponse={{
+            addReaction: {
+              subject: {
+                reactions: {
+                  viewerHasReacted: true,
+                  __typename: "ReactionConnection",
+                },
+                id: id,
+                __typename: "Issue",
+              },
+              __typename: "RemoveReactionPayload",
+            },
+          }}
+        >
           {addReaction => (
-            <button
-              onClick={() =>
-                addReaction({
-                  optimisticResponse: {
-                    addReaction: {
-                      subject: {
-                        reactions: {
-                          viewerHasReacted: true,
-                          __typename: "ReactionConnection",
-                        },
-                        id: id,
-                        __typename: "Issue",
-                      },
-                      __typename: "RemoveReactionPayload",
-                    },
-                  },
-                })
-              }
-            >
-              👍
+            <button onClick={addReaction}>
+              <span role="img" aria-label="thumbsup">
+                👍
+              </span>
             </button>
           )}
         </Mutation>
